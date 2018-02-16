@@ -17,6 +17,12 @@ public:
 
 protected:
 
+    /*
+     * Allows to:
+     * 1. Sort by patient's presence
+     * 2. Search by first name or last name or father name
+     * 3. Search by Full name using format: [first name] [last name] [father name]
+     * */
     bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
 
 private:

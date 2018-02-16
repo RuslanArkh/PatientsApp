@@ -24,29 +24,34 @@ PatientsWindow::PatientsWindow(DBManager * db, QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->btn_DeletePatient->setDisabled(true);
 
-    m_pModel = new PatientsModel(m_pDatabaseManager->SelectAllPatients(), this);
 
+    //  Selecting all patients from database into std::vector
+    std::vector<Patient *> * allPatients = m_pDatabaseManager->SelectAllPatients();
+
+    //  Creating custom MODEL for patients
+    m_pModel = new PatientsModel(allPatients, ui->tvPatients);
+
+    //  Creating PROXY for main model
     m_pProxyModel = new PatientsFilterProxyModel(this);
     m_pProxyModel->setSourceModel(m_pModel);
-
-    ui->tvPatients->setModel(m_pProxyModel);
-    ui->tvPatients->verticalHeader()->hide();
-    //ui->tvPatients->horizontalHeader()->setStretchLastSection(true);
-    //ui->tvPatients->resizeColumnsToContents();
-
-    m_pButtonDelegate = new DeleteButtonDelegate(ui->tvPatients);
-
-    ui->tvPatients->setEditTriggers(QAbstractItemView::AllEditTriggers);
-
-    ui->tvPatients->setItemDelegateForColumn(2, m_pButtonDelegate);
-
-    ui->tvPatients->setColumnWidth(2, 45);
-
     m_pProxyModel->setStillHere(ui->checkBox_StillHere->isChecked());
     m_pProxyModel->setLeft(ui->checkBox_Left->isChecked());
 
+    //  Creating custom DELEGATE for third column in TableView
+    m_pButtonDelegate = new DeleteButtonDelegate(ui->tvPatients);
+
+    //  Configuring table VIEW for data representation
+    ui->tvPatients->setModel(m_pProxyModel);
+    ui->tvPatients->verticalHeader()->hide();
+    ui->tvPatients->setEditTriggers(QAbstractItemView::AllEditTriggers);
+    ui->tvPatients->setItemDelegateForColumn(2, m_pButtonDelegate);
+    ui->tvPatients->setColumnWidth(0, ((ui->tvPatients->width() * 10) / 2));
+    ui->tvPatients->setColumnWidth(2, 60);
+    ui->btn_DeletePatient->setDisabled(true);
+
+    //  Connecting 'itemForRemove' signal with this->DeleteByIndex function
+    //  to enable communication MODEL and VIEW via custom DELEGATE 'DeleteButtonDelegate'
     connect(m_pModel, &PatientsModel::itemForRemove,
             this, &PatientsWindow::DeleteByIndex);
 }
@@ -101,8 +106,9 @@ void PatientsWindow::on_tvPatients_doubleClicked(const QModelIndex &proxy_index)
 
     try {
         pP->loadPhotos(photos);
-        PatientPhotos photos_window(pP, this);
+        ViewPatient photos_window(pP, this);
         photos_window.exec();
+        pP->clearPhotos();
     } catch (Patient_Ex::PhotosAlreadyLoadedError) {
         for (Photo * pPhoto: *photos)
             delete pPhoto;
@@ -118,10 +124,12 @@ void PatientsWindow::on_lineEdit_Search_textChanged(const QString & str1) {
 }
 
 void PatientsWindow::on_checkBox_StillHere_stateChanged(int arg1){
+    qDebug() << arg1;
     m_pProxyModel->setStillHere(ui->checkBox_StillHere->isChecked());
 }
 
 void PatientsWindow::on_checkBox_Left_stateChanged(int arg1) {
+    qDebug() << arg1;
     m_pProxyModel->setLeft(ui->checkBox_Left->isChecked());
 }
 
@@ -136,4 +144,8 @@ void PatientsWindow::on_tvPatients_activated(const QModelIndex &index)
 
 void PatientsWindow::DeleteByIndex(const QModelIndex & index) {
     qDebug() << index.row();
+    int source_index = m_pProxyModel->mapToSource(index).row();
+    Patient * pP = m_pModel->GetPatient(source_index);
+    m_pDatabaseManager->removePatient(pP->GetId());
+    m_pModel->DeletePatient(source_index);
 }

@@ -37,9 +37,9 @@ SOURCES += \
     imageview.cpp \
     view_patient.cpp \
     patients_model.cpp \
-    patients_filter_proxe_model.cpp \
     delete_button_delegate.cpp \
-    cremovepatientbutton.cpp
+    cremovepatientbutton.cpp \
+    patients_filter_proxy_model.cpp
 
 HEADERS += \
     patient.h \

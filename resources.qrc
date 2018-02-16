@@ -1,5 +1,6 @@
 <RCC>
+    <qresource prefix="/images"/>
     <qresource prefix="/">
-        <file>images/koza_1.jpg</file>
+        <file>app_images/medicine.png</file>
     </qresource>
 </RCC>

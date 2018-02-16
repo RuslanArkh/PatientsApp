@@ -16,17 +16,17 @@ class PatientsWindow;
 #define ICON_HEIGHT 200
 
 namespace Ui {
-class PatientPhotos;
+class ViewPatient;
 }
 
-class PatientPhotos : public QDialog
+class ViewPatient : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit PatientPhotos(Patient * patient,
+    explicit ViewPatient(Patient * patient,
                            QWidget *parent = 0);
-    ~PatientPhotos();
+    ~ViewPatient();
 
 private slots:
     void on_btnNewPhoto_clicked();
@@ -51,7 +51,7 @@ private:
     void AddItemToWidget(Photo * _p);
     void SetLineEditFields();
 
-    Ui::PatientPhotos *ui;
+    Ui::ViewPatient *ui;
     //  Pointer to parent window
     PatientsWindow * m_pPatientsWindow;
     //  Header for table list

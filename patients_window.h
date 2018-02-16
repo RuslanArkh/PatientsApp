@@ -22,11 +22,13 @@
 #include "new_patient.h"
 #include "view_patient.h"
 
-class QSqlTableModel;
-
 namespace Ui {
 class MainWindow;
 }
+
+
+//  UI file is called mainwindow.ui
+//  tvPatients stands for Table View Patients
 
 class PatientsWindow
         : public QMainWindow

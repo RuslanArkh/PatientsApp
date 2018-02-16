@@ -15,15 +15,17 @@
 
 
 //  TODO: make it singleton
-//  TODO: make two derived classes: PatientManager and PhotoManager
 class DBManager {
-    QSqlDatabase m_db;
+    QSqlDatabase * m_db;
 
     static const std::regex db_file_format;
 
 public:
 
+    static DBManager & instance();
+
     DBManager(const QString & _databaseName);
+    ~DBManager();
 
     Patient * insert(Patient & p) const;
     void insert(const Photo & _photo) const;
@@ -45,6 +47,6 @@ private:
     std::vector<Patient *> * GetPatientsFromQuery(QSqlQuery & _q);
 };
 
-inline bool DBManager::HasTable(const QString & _table) { return m_db.tables().contains(_table); }
+inline bool DBManager::HasTable(const QString & _table) { return m_db->tables().contains(_table); }
 
 #endif // DBMANAGER_H

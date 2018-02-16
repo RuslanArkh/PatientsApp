@@ -66,10 +66,11 @@ void DeleteButtonDelegate::paint(QPainter *painter,
 
     auto proxy_model =
             dynamic_cast<const PatientsFilterProxyModel *>(index.model());
-    m_sourceIndex = proxy_model->mapToSource(index);
+
 
     QApplication::style()->drawControl
             (QStyle::CE_PushButton, &button, painter);
+    m_sourceIndex = proxy_model->mapToSource(index);
 }
 
 bool DeleteButtonDelegate::editorEvent(QEvent *event,
@@ -77,7 +78,7 @@ bool DeleteButtonDelegate::editorEvent(QEvent *event,
                                        const QStyleOptionViewItem &option,
                                        const QModelIndex &index)
 {
-    if( event->type() == QEvent::MouseButtonRelease )
+    if( event->type() == QEvent::MouseButtonPress )
     {
         QMouseEvent * e = (QMouseEvent *)event;
         int clickX = e->x();
@@ -93,8 +94,7 @@ bool DeleteButtonDelegate::editorEvent(QEvent *event,
         if( clickX > x && clickX < x + w ) {
             if( clickY > y && clickY < y + h )
              {
-                emit dynamic_cast<const PatientsModel *>
-                    (m_sourceIndex.model())->itemForRemove(m_sourceIndex);
+                emit dynamic_cast<const PatientsModel *>(m_sourceIndex.model())->itemForRemove(index);
              }
         }
     }

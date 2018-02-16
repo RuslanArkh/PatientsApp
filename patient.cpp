@@ -43,10 +43,12 @@ void Patient::loadPhotos(std::vector<Photo*> * photos) {
         Patient_Ex::PhotosAlreadyLoadedError().raise();
 }
 
-void Patient::ClearPhotos() {
+void Patient::clearPhotos() {
     if (m_pPhotosVector)
         for (Photo * pPhoto: * m_pPhotosVector)
             delete pPhoto;
+    delete m_pPhotosVector;
+    m_pPhotosVector = nullptr;
 }
 
 const std::vector<Photo *> * Patient::Photos() const {

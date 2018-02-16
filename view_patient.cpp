@@ -19,10 +19,10 @@
 #include <list>
 #include <string>
 
-PatientPhotos::PatientPhotos(Patient * patient,
+ViewPatient::ViewPatient(Patient * patient,
                              QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::PatientPhotos)
+    ui(new Ui::ViewPatient)
 {
     ui->setupUi(this);
     m_pPatientsWindow = dynamic_cast<PatientsWindow *>(parentWidget());
@@ -54,12 +54,12 @@ PatientPhotos::PatientPhotos(Patient * patient,
             this, SLOT(CheckChangesLeaveDate(const QDate &)));
 }
 
-PatientPhotos::~PatientPhotos()
+ViewPatient::~ViewPatient()
 {
     delete ui;
 }
 
-void PatientPhotos::SetLineEditFields() {
+void ViewPatient::SetLineEditFields() {
     ui->leFirstName->setText(m_pCurrentPatient->GetFirstName());
     ui->leLastName->setText(m_pCurrentPatient->GetLastName());
     ui->leFatherName->setText(m_pCurrentPatient->GetFatherName());
@@ -68,7 +68,7 @@ void PatientPhotos::SetLineEditFields() {
     ui->deBirthDate->setDate(m_pCurrentPatient->GetBirthDate());
     ui->deArriveDate->setDate(m_pCurrentPatient->GetArriveDate());
 
-    QDate * temp_leave_date = m_pCurrentPatient->LeaveDate();
+    const QDate * temp_leave_date = m_pCurrentPatient->LeaveDate();
 
     if (temp_leave_date) {
         ui->deLeaveDate->setDate(*m_pCurrentPatient->LeaveDate());
@@ -78,7 +78,7 @@ void PatientPhotos::SetLineEditFields() {
         ui->deLeaveDate->setDisabled(true);
 }
 
-void PatientPhotos::AddItemToWidget(Photo * p) {
+void ViewPatient::AddItemToWidget(Photo * p) {
     QPixmap outPixmap {p->GetPixmap()};
     QIcon icon(outPixmap.scaled(ICON_WIDTH, ICON_HEIGHT,
                                 Qt::KeepAspectRatio));
@@ -88,29 +88,28 @@ void PatientPhotos::AddItemToWidget(Photo * p) {
     ui->listWidget_ImageGallery->addItem(itm);
 }
 
-void PatientPhotos::on_btnNewPhoto_clicked(){
+void ViewPatient::on_btnNewPhoto_clicked(){
+    //  Open dialog box for selectig .jpg images
     QStringList file_names = QFileDialog::getOpenFileNames(this,
                                                      "Open a file",
                                                      qApp->applicationDirPath() + QDir::separator(),
                                                      tr("Image Files (*.jpg *.JPG);;"));
+    //  Converting list of selected images to standard list
     std::list<QString> file_list = file_names.toStdList();
-    for (QString & name: file_list) {
-        qDebug() << name[name.size()-1];
 
-        QString just_name{};
-        //  Getting filename from path
-        for (unsigned int i = name.size()-1; name[i] != QDir::separator(); --i)
-            just_name.insert(0, name[i]);
-        qDebug() << just_name;
+    for (QString & name: file_list) {
+
+        QFile file(name);
+        QFileInfo fileInfo(file.fileName());
+        QString fileName(fileInfo.fileName());
 
         //  Opening file and saving to QPixmap
-        QFile file(name);
         QPixmap temp_pixMap;
         if (file.open(QIODevice::ReadOnly))
             temp_pixMap.loadFromData(file.readAll());
 
         Photo * new_file = new Photo(this->m_pCurrentPatient->GetId(),
-                                     just_name,
+                                     fileName,
                                      temp_pixMap,
                                      QDate::currentDate());
         m_pCurrentPatient->AddPhoto(new_file);
@@ -119,7 +118,7 @@ void PatientPhotos::on_btnNewPhoto_clicked(){
     }
 }
 
-void PatientPhotos::on_btnDeletePhoto_clicked() {
+void ViewPatient::on_btnDeletePhoto_clicked() {
     QList<QListWidgetItem*> items = ui->listWidget_ImageGallery->selectedItems();
     foreach (QListWidgetItem * item, items) {
         int row_num = ui->listWidget_ImageGallery->row(item);
@@ -131,58 +130,50 @@ void PatientPhotos::on_btnDeletePhoto_clicked() {
     }
 }
 
-void PatientPhotos::on_btnUpdatePatient_clicked() {
-    int temp_id = m_pCurrentPatient->GetId();
-
-    QString fname = ui->leFirstName->text();
-    QString lname = ui->leLastName->text();
-    QString father_name = ui->leFatherName->text();
-    QString address = ui->leAddress->text();
-    QDate bdate = ui->deBirthDate->date();
-    QDate arrdate = ui->deArriveDate->date();
+void ViewPatient::on_btnUpdatePatient_clicked() {
+    m_pCurrentPatient->SetFirstName(ui->leFirstName->text());
+    m_pCurrentPatient->SetLastName(ui->leLastName->text());
+    m_pCurrentPatient->SetFatherName(ui->leFatherName->text());
+    m_pCurrentPatient->SetAddress(ui->leAddress->text());
+    m_pCurrentPatient->SetBirthDate(ui->deBirthDate->date());
+    m_pCurrentPatient->SetArriveDate(ui->deArriveDate->date());
 
     QDate * leaveDate;
     if (ui->deLeaveDate->isEnabled())
         leaveDate = new QDate( ui->deLeaveDate->date() );
     else
         leaveDate = nullptr;
-
-    delete m_pCurrentPatient;
-    m_pCurrentPatient = nullptr;
-    m_pCurrentPatient =
-            new Patient(fname, lname, father_name, address, bdate, arrdate, *leaveDate);
-    m_pCurrentPatient->SetId(temp_id);
     m_pPatientsWindow->UpdatePatient(*m_pCurrentPatient);
 
     ui->btnUpdatePatient->setEnabled(false);
     ui->btnUnstageChanges->setEnabled(false);
 }
 
-void PatientPhotos::CheckChangesFname(const QString & _arg) {
+void ViewPatient::CheckChangesFname(const QString & _arg) {
     ui->btnUpdatePatient->setEnabled(_arg != m_pCurrentPatient->GetFirstName());
     ui->btnUnstageChanges->setEnabled(_arg != m_pCurrentPatient->GetFirstName());
 }
-void PatientPhotos::CheckChangesLname(const QString & _arg) {
+void ViewPatient::CheckChangesLname(const QString & _arg) {
     ui->btnUpdatePatient->setEnabled(_arg != m_pCurrentPatient->GetLastName());
     ui->btnUnstageChanges->setEnabled(_arg != m_pCurrentPatient->GetLastName());
 }
-void PatientPhotos::CheckChangesFathername(const QString & _arg) {
+void ViewPatient::CheckChangesFathername(const QString & _arg) {
     ui->btnUpdatePatient->setEnabled(_arg != m_pCurrentPatient->GetFatherName());
     ui->btnUnstageChanges->setEnabled(_arg != m_pCurrentPatient->GetFatherName());
 }
-void PatientPhotos::CheckChangesAddress(const QString & _arg) {
+void ViewPatient::CheckChangesAddress(const QString & _arg) {
     ui->btnUpdatePatient->setEnabled(_arg != m_pCurrentPatient->GetAddress());
     ui->btnUnstageChanges->setEnabled(_arg != m_pCurrentPatient->GetAddress());
 }
-void PatientPhotos::CheckChangesBDate(const QDate & _arg) {
+void ViewPatient::CheckChangesBDate(const QDate & _arg) {
     ui->btnUpdatePatient->setEnabled(_arg != m_pCurrentPatient->GetBirthDate());
     ui->btnUnstageChanges->setEnabled(_arg != m_pCurrentPatient->GetBirthDate());
 }
-void PatientPhotos::CheckChangesArriveDate(const QDate & _arg) {
+void ViewPatient::CheckChangesArriveDate(const QDate & _arg) {
     ui->btnUpdatePatient->setEnabled(_arg != m_pCurrentPatient->GetArriveDate());
     ui->btnUnstageChanges->setEnabled(_arg != m_pCurrentPatient->GetArriveDate());
 }
-void PatientPhotos::CheckChangesLeaveDate(const QDate & _arg) {
+void ViewPatient::CheckChangesLeaveDate(const QDate & _arg) {
     if (m_pCurrentPatient->LeaveDate()) {
         ui->btnUpdatePatient->setEnabled(_arg != *m_pCurrentPatient->LeaveDate());
         ui->btnUnstageChanges->setEnabled(_arg != *m_pCurrentPatient->LeaveDate());
@@ -192,14 +183,14 @@ void PatientPhotos::CheckChangesLeaveDate(const QDate & _arg) {
     }
 }
 
-void PatientPhotos::on_btnSetLeaveDate_clicked(){
+void ViewPatient::on_btnSetLeaveDate_clicked(){
     ui->deLeaveDate->setEnabled(true);
     ui->deLeaveDate->setFocus();
     ui->btnUpdatePatient->setEnabled(true);
     ui->btnUnstageChanges->setEnabled(true);
 }
 
-void PatientPhotos::on_btnUnstageChanges_clicked() {
+void ViewPatient::on_btnUnstageChanges_clicked() {
     SetLineEditFields();
     ui->btnUpdatePatient->setEnabled(false);
     ui->btnUnstageChanges->setEnabled(false);

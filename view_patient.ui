@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>PatientPhotos</class>
- <widget class="QDialog" name="PatientPhotos">
+ <class>ViewPatient</class>
+ <widget class="QDialog" name="ViewPatient">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>714</width>
-    <height>402</height>
+    <width>816</width>
+    <height>539</height>
    </rect>
   </property>
   <property name="windowTitle">

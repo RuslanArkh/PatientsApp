@@ -10,6 +10,8 @@
 
 const int COLS = 3;
 
+//  Custom model to store patients in std::vector for more explicity
+
 class PatientsModel : public QAbstractTableModel {
 
     Q_OBJECT

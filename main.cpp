@@ -16,6 +16,7 @@ int main(int argc, char *argv[])
     try {
         DBManager manager{"my_db.sqlite"};
         PatientsWindow w(&manager);
+        w.setWindowIcon(QIcon(":/app_images/medicine.png"));
         w.show();
         return a.exec();
     } catch (DBManagerEx::SqlFileWrongFormat & _ex) {

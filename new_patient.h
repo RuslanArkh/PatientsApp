@@ -35,7 +35,7 @@ private slots:
 private:
     Ui::NewPatient *ui;
 
-    bool NoErrors(std::vector<QLineEdit*> & _lst);
+    bool CheckInputInvariants(std::vector<QLineEdit*> & _lst);
 
     bool CreatePatient();
 };

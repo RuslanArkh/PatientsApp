@@ -60,7 +60,6 @@ void PatientsModel::AddPatient(Patient & p) {
     endInsertRows();
 }
 
-
 /*
 bool PatientsModel::removeRows(int row, int count, const QModelIndex &parent)
 {

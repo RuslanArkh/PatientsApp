@@ -8,16 +8,19 @@
 #include <QPixmap>
 #include <QVariant>
 
+//  Just leave it here for future project modifications
 const std::regex DBManager::db_file_format { R"(^\w*[.](sqlite)$)" };
 
 DBManager::DBManager(const QString & _str) {
     const QString Driver("QSQLITE");
-    m_db = QSqlDatabase::addDatabase(Driver);
+    m_db = new QSqlDatabase(QSqlDatabase::addDatabase(Driver));
+
     if (!std::regex_match(_str.toStdString(), db_file_format))
         DBManagerEx::SqlFileWrongFormat(_str).raise();
-    m_db.setDatabaseName(qApp->applicationDirPath() + QDir::separator() + _str);
 
-    if (!m_db.open()) {
+    m_db->setDatabaseName(qApp->applicationDirPath() + QDir::separator() + _str);
+
+    if (!m_db->open()) {
         QMessageBox::critical(0, qApp->tr("Cannot open database"),
             qApp->tr("Unable to establish a database connection.\n"
                      "This example needs SQLite support. Please read "
@@ -44,6 +47,11 @@ DBManager::DBManager(const QString & _str) {
                "created_on TEXT,"
                "FOREIGN KEY (patient_id) REFERENCES patient(id))");
 
+}
+
+DBManager::~DBManager() {
+    m_db->close();
+    delete m_db;
 }
 
 

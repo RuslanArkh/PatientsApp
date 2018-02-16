@@ -18,7 +18,7 @@ NewPatient::~NewPatient()
     delete ui;
 }
 
-bool NewPatient::NoErrors(std::vector<QLineEdit*> & _lst) {
+bool NewPatient::CheckInputInvariants(std::vector<QLineEdit*> & _lst) {
     bool isInt = false;
     bool no_error = true;
     for (QLineEdit * _line: _lst) {
@@ -39,7 +39,7 @@ bool NewPatient::CreatePatient() {
                                 ui->lineEdit_LastName,
                                 ui->lineEdit_FatherName,
                                 ui->lineEdit_Address};
-    if (!NoErrors(vec))
+    if (!CheckInputInvariants(vec))
         return false;
     QString fname = ui->lineEdit_FirstName->text();
     QString lname = ui->lineEdit_LastName->text();

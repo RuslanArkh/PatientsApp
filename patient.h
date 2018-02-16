@@ -13,10 +13,10 @@
 class Patient {
 
     mutable int id;
-    const QString _FirstName, _LastName, _FatherName;
-    const QString _Address;
-    const QDate _BirthDate;
-    const QDate _ArriveDate;
+    QString _FirstName, _LastName, _FatherName;
+    QString _Address;
+    QDate _BirthDate;
+    QDate _ArriveDate;
 
     QDate * m_pLeaveDate;
 
@@ -44,8 +44,15 @@ public:
     const QString & GetAddress() const;
     const QDate & GetBirthDate() const;
     const QDate & GetArriveDate() const;
+    const QDate * LeaveDate() const;
 
-    QDate * LeaveDate();
+    void SetFirstName(const QString & fname);
+    void SetLastName(const QString & lname);
+    void SetFatherName(const QString & fathername);
+    void SetAddress(const QString & address);
+    void SetBirthDate(const QDate & birthDate);
+    void SetArriveDate(const QDate & arriveDate);
+    void SetLeaveDate(const QDate & leaveDate);
 
     bool StillHere() const;
     bool Left() const;
@@ -53,7 +60,7 @@ public:
     const QString GetFullName() const;
 
     void loadPhotos(std::vector<Photo*> * photos);
-    void ClearPhotos();
+    void clearPhotos();
 
     const std::vector<Photo *> * Photos() const;
     void DropPhoto(int row_num);
@@ -69,11 +76,20 @@ inline const QString & Patient::GetFatherName() const { return _FatherName; }
 inline const QString & Patient::GetAddress() const { return _Address; }
 inline const QDate & Patient::GetBirthDate() const { return _BirthDate; }
 inline const QDate & Patient::GetArriveDate() const { return _ArriveDate; }
-inline QDate * Patient::LeaveDate() { return m_pLeaveDate; }
+inline const QDate * Patient::LeaveDate() const { return m_pLeaveDate; }
+
+inline void Patient::SetFirstName(const QString & fname )  { this->_FirstName = fname; }
+inline void Patient::SetLastName(const QString & lname )  { this->_LastName = lname; }
+inline void Patient::SetFatherName(const QString & fathername )  { this->_FatherName = fathername; }
+inline void Patient::SetAddress(const QString & address )  { this->_Address = address; }
+inline void Patient::SetBirthDate(const QDate & bdate )  { this->_BirthDate = bdate; }
+inline void Patient::SetArriveDate(const QDate & arrdate )  { this->_ArriveDate = arrdate; }
+inline void Patient::SetLeaveDate(const QDate & leaveDate ) { *m_pLeaveDate = leaveDate; }
 
 inline bool Patient::StillHere() const {
     return (!m_pLeaveDate) || (m_pLeaveDate && *m_pLeaveDate > QDate::currentDate());
 }
+
 inline bool Patient::Left() const {
     return (m_pLeaveDate) && (*m_pLeaveDate < QDate::currentDate());
 }
