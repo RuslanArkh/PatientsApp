@@ -124,12 +124,10 @@ void PatientsWindow::on_lineEdit_Search_textChanged(const QString & str1) {
 }
 
 void PatientsWindow::on_checkBox_StillHere_stateChanged(int arg1){
-    qDebug() << arg1;
     m_pProxyModel->setStillHere(ui->checkBox_StillHere->isChecked());
 }
 
 void PatientsWindow::on_checkBox_Left_stateChanged(int arg1) {
-    qDebug() << arg1;
     m_pProxyModel->setLeft(ui->checkBox_Left->isChecked());
 }
 
@@ -143,9 +141,16 @@ void PatientsWindow::on_tvPatients_activated(const QModelIndex &index)
 }
 
 void PatientsWindow::DeleteByIndex(const QModelIndex & index) {
-    qDebug() << index.row();
+
     int source_index = m_pProxyModel->mapToSource(index).row();
     Patient * pP = m_pModel->GetPatient(source_index);
-    m_pDatabaseManager->removePatient(pP->GetId());
-    m_pModel->DeletePatient(source_index);
+
+    QMessageBox::StandardButton reply;
+    QString question{"Patient "};
+    question += pP->GetFullName() + " will be deleted. Are you sure?";
+    reply = QMessageBox::question(this, "Patient deletion", question, QMessageBox::Yes | QMessageBox::No);
+    if (reply == QMessageBox::Yes) {
+        m_pDatabaseManager->removePatient(pP->GetId());
+        m_pModel->DeletePatient(source_index);
+    }
 }

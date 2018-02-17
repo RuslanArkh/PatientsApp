@@ -93,9 +93,6 @@ void DBManager::insert(const Photo & _photo) const {
     if (!query.exec())
         DBManagerEx::SqlQueryFailed(query.lastError()).raise();
     _photo.SetId(query.lastInsertId().toInt());
-
-    qDebug() << "Photo inserted!";
-
 }
 
 
@@ -208,14 +205,6 @@ std::vector<Patient *> * DBManager::GetPatientsFromQuery(QSqlQuery & _q) {
             leave_date = nullptr;
         else
             leave_date = new QDate(_q.value(7).toDate());
-        /*try {
-            Patient stack_p(fname,
-                            lname,
-                            father_name,
-                            address,
-                            birth_date,
-                            arr_date,
-                            *leave_date);*/
             Patient * temp_p = new Patient(fname,
                                            lname,
                                            father_name,
@@ -225,15 +214,6 @@ std::vector<Patient *> * DBManager::GetPatientsFromQuery(QSqlQuery & _q) {
                                            *leave_date);
             temp_p->SetId(id);
             temp_patients->push_back(temp_p);
-        /*} catch (Patient_Ex::BirthAndArriveDateLogicError & _ex) {
-            QString exc_msg{};
-            exc_msg += "WARNING: Patient: [";
-            exc_msg += "ID: " + QString::number(id) + " First Name: " + fname +
-                    " Last Name: " + lname + "]\n";
-            exc_msg += "Was not added to list due to date logic exception:\n";
-            exc_msg += _ex.message();
-            qDebug() << exc_msg;
-        }*/
     }
     return temp_patients;
 }

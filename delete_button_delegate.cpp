@@ -23,12 +23,7 @@ QWidget * DeleteButtonDelegate::createEditor(QWidget *parent,
                                              const QStyleOptionViewItem &option,
                                              const QModelIndex &index) const
 {
-    //CRemovePatientButton *pB = new CRemovePatientButton(parent);
-    //pB->setText("Remove");
-    //auto proxy_model =
-            dynamic_cast<const QSortFilterProxyModel *>(index.model());
-    //pB->setModelIndex(proxy_model->mapToSource(index));
-    //pB->setGeometry(0, 0, 30, 30);
+
 
     return nullptr;
 }
@@ -37,40 +32,32 @@ void DeleteButtonDelegate::paint(QPainter *painter,
                                  const QStyleOptionViewItem &option,
                                  const QModelIndex &index) const
 {
-    /*
-    CRemovePatientButton button;
     QRect r = option.rect;//getting the rect of the cell
     int x,y,w,h;
-    x = r.left() + r.width() - 30;//the X coordinate
-    y = r.top();//the Y coordinate
-    w = 30;//button width
-    h = 30;//button height
-    button.setGeometry( QRect(x,y,w,h) );
-    button.setText("Delete");
-    button.setEnabled(true);
-    auto proxy_model =
-            dynamic_cast<const PatientsFilterProxyModel *>(index.model());
-
-    button.setModelIndex(proxy_model->mapToSource(index));
-*/
-    QStyleOptionButton button;
-    QRect r = option.rect;//getting the rect of the cell
-    int x,y,w,h;
-    x = r.left() + r.width() - 45;//the X coordinate
-    y = r.top();//the Y coordinate
-    w = 45; //button width
+    x = r.left() + r.width() - 57;//the X coordinate
+    y = r.top() + 4;//the Y coordinate
+    w = 56; //button width
     h = 30; //button height
+
+    QStyleOptionButton button;
+//    CRemovePatientButton *pB = new CRemovePatientButton;
+//    pB->setText("Remove");
+//    auto proxy_model = dynamic_cast<const QSortFilterProxyModel *>(index.model());
+//    pB->setModelIndex(proxy_model->mapToSource(index));
+//    pB->setGeometry(0, 0, 30, 30);
+
+//    pB->rect = QRect(x,y,w,h);
+//    pB->text = "Delete";
+//    pB->state = QStyle::State_Enabled;
+
     button.rect = QRect(x,y,w,h);
     button.text = "Delete";
     button.state = QStyle::State_Enabled;
 
-    auto proxy_model =
-            dynamic_cast<const PatientsFilterProxyModel *>(index.model());
+    auto patients_proxy_model = dynamic_cast<const PatientsFilterProxyModel *>(index.model());
 
-
-    QApplication::style()->drawControl
-            (QStyle::CE_PushButton, &button, painter);
-    m_sourceIndex = proxy_model->mapToSource(index);
+    QApplication::style()->drawControl(QStyle::CE_PushButton, &button, painter);
+    m_sourceIndex = patients_proxy_model->mapToSource(index);
 }
 
 bool DeleteButtonDelegate::editorEvent(QEvent *event,
