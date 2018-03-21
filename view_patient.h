@@ -29,21 +29,11 @@ public:
     ~ViewPatient();
 
 private slots:
+
     void on_btnNewPhoto_clicked();
     void on_btnDeletePhoto_clicked();
-
     void on_btnUpdatePatient_clicked();
-
-    void CheckChangesFname(const QString & _arg);
-    void CheckChangesLname(const QString & _arg);
-    void CheckChangesFathername(const QString & _arg);
-    void CheckChangesAddress(const QString & _arg);
-    void CheckChangesBDate(const QDate & _arg);
-    void CheckChangesArriveDate(const QDate & _arg);
-    void CheckChangesLeaveDate(const QDate & _arg);
-
     void on_btnSetLeaveDate_clicked();
-
     void on_btnUnstageChanges_clicked();
 
 private:
@@ -59,6 +49,9 @@ private:
 
     QLabel * myLabel;
     Patient * m_pCurrentPatient;
+
+    void SetControlButtonsState(bool is_enabled);
+
 };
 
 

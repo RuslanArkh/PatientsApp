@@ -38,10 +38,10 @@ public:
     void SetId(int _id) const;
 
     int GetId() const;
-    const QString & GetFirstName() const;
-    const QString & GetLastName() const;
-    const QString & GetFatherName() const;
-    const QString & GetAddress() const;
+    QString GetFirstName() const;
+    QString GetLastName() const;
+    QString GetFatherName() const;
+    QString GetAddress() const;
     const QDate & GetBirthDate() const;
     const QDate & GetArriveDate() const;
     const QDate * LeaveDate() const;
@@ -70,10 +70,10 @@ public:
 inline void Patient::SetId(int _id) const { id = _id; }
 
 inline int Patient::GetId() const { return id; }
-inline const QString & Patient::GetFirstName() const { return _FirstName; }
-inline const QString & Patient::GetLastName() const { return _LastName; }
-inline const QString & Patient::GetFatherName() const { return _FatherName; }
-inline const QString & Patient::GetAddress() const { return _Address; }
+inline QString Patient::GetFirstName() const { return _FirstName; }
+inline QString Patient::GetLastName() const { return _LastName; }
+inline QString Patient::GetFatherName() const { return _FatherName; }
+inline QString Patient::GetAddress() const { return _Address; }
 inline const QDate & Patient::GetBirthDate() const { return _BirthDate; }
 inline const QDate & Patient::GetArriveDate() const { return _ArriveDate; }
 inline const QDate * Patient::LeaveDate() const { return m_pLeaveDate; }

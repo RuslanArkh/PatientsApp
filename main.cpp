@@ -8,6 +8,7 @@
 #include <QDebug>
 #include <QMessageBox>
 #include <QString>
+#include <QThreadPool>
 
 int main(int argc, char *argv[])
 {

@@ -38,25 +38,50 @@ ViewPatient::ViewPatient(Patient * patient,
     for (Photo * _p: *m_pCurrentPatient->Photos())
         AddItemToWidget(_p);
 
-    connect(this->ui->leFirstName, SIGNAL(textChanged(const QString &)),
-            this, SLOT(CheckChangesFname(const QString &)));
-    connect(this->ui->leLastName, SIGNAL(textChanged(const QString &)),
-            this, SLOT(CheckChangesLname(const QString &)));
-    connect(this->ui->leFatherName, SIGNAL(textChanged(const QString &)),
-            this, SLOT(CheckChangesFathername(const QString &)));
-    connect(this->ui->leAddress, SIGNAL(textChanged(const QString &)),
-            this, SLOT(CheckChangesAddress(const QString &)));
-    connect(this->ui->deBirthDate, SIGNAL(dateChanged(const QDate &)),
-            this, SLOT(CheckChangesBDate(const QDate &)));
-    connect(this->ui->deArriveDate, SIGNAL(dateChanged(const QDate &)),
-            this, SLOT(CheckChangesArriveDate(const QDate &)));
-    connect(this->ui->deLeaveDate, SIGNAL(dateChanged(const QDate &)),
-            this, SLOT(CheckChangesLeaveDate(const QDate &)));
+    auto reflect = [this] (QVariant arg_prev, QVariant arg_cur) {
+        this->SetControlButtonsState(arg_prev != arg_cur);
+    };
+
+    connect(this->ui->leFirstName, &QLineEdit::textChanged, [this, reflect] (const QString & new_str) {
+        reflect(QVariant(this->m_pCurrentPatient->GetFirstName()), QVariant(new_str));
+    });
+
+    connect(this->ui->leLastName, &QLineEdit::textChanged, [this, reflect] (const QString & new_str) {
+        reflect(QVariant(this->m_pCurrentPatient->GetLastName()), QVariant(new_str));
+    });
+
+    connect(this->ui->leFatherName, &QLineEdit::textChanged, [this, reflect] (const QString & new_str) {
+        reflect(QVariant(this->m_pCurrentPatient->GetFatherName()), QVariant(new_str));
+    });
+
+    connect(this->ui->leAddress, &QLineEdit::textChanged, [this, reflect] (const QString & new_str) {
+        reflect(QVariant(this->m_pCurrentPatient->GetAddress()), QVariant(new_str));
+    });
+
+    connect(this->ui->deBirthDate, &QDateEdit::dateChanged, [this, reflect] (const QDate & new_date) {
+        reflect(QVariant(this->m_pCurrentPatient->GetBirthDate()), QVariant(new_date));
+    });
+
+    connect(this->ui->deArriveDate, &QDateEdit::dateChanged, [this, reflect] (const QDate & new_date) {
+        reflect(QVariant(this->m_pCurrentPatient->GetArriveDate()), QVariant(new_date));
+    });
+
+    connect(this->ui->deLeaveDate, &QDateEdit::dateChanged, [this] (const QDate & new_date) {
+        if (this->m_pCurrentPatient->LeaveDate())
+            this->SetControlButtonsState(new_date != *this->m_pCurrentPatient->LeaveDate());
+        else
+            this->SetControlButtonsState(true);
+    });
 }
 
 ViewPatient::~ViewPatient()
 {
     delete ui;
+}
+
+void ViewPatient::SetControlButtonsState(bool is_enabled) {
+    ui->btnUpdatePatient->setEnabled(is_enabled);
+    ui->btnUnstageChanges->setEnabled(is_enabled);
 }
 
 void ViewPatient::SetLineEditFields() {
@@ -138,60 +163,26 @@ void ViewPatient::on_btnUpdatePatient_clicked() {
     m_pCurrentPatient->SetBirthDate(ui->deBirthDate->date());
     m_pCurrentPatient->SetArriveDate(ui->deArriveDate->date());
 
-    QDate * leaveDate;
-    if (ui->deLeaveDate->isEnabled())
-        leaveDate = new QDate( ui->deLeaveDate->date() );
-    else
-        leaveDate = nullptr;
     m_pPatientsWindow->UpdatePatient(*m_pCurrentPatient);
 
-    ui->btnUpdatePatient->setEnabled(false);
-    ui->btnUnstageChanges->setEnabled(false);
+    SetControlButtonsState(false);
 }
 
-void ViewPatient::CheckChangesFname(const QString & _arg) {
-    ui->btnUpdatePatient->setEnabled(_arg != m_pCurrentPatient->GetFirstName());
-    ui->btnUnstageChanges->setEnabled(_arg != m_pCurrentPatient->GetFirstName());
-}
-void ViewPatient::CheckChangesLname(const QString & _arg) {
-    ui->btnUpdatePatient->setEnabled(_arg != m_pCurrentPatient->GetLastName());
-    ui->btnUnstageChanges->setEnabled(_arg != m_pCurrentPatient->GetLastName());
-}
-void ViewPatient::CheckChangesFathername(const QString & _arg) {
-    ui->btnUpdatePatient->setEnabled(_arg != m_pCurrentPatient->GetFatherName());
-    ui->btnUnstageChanges->setEnabled(_arg != m_pCurrentPatient->GetFatherName());
-}
-void ViewPatient::CheckChangesAddress(const QString & _arg) {
-    ui->btnUpdatePatient->setEnabled(_arg != m_pCurrentPatient->GetAddress());
-    ui->btnUnstageChanges->setEnabled(_arg != m_pCurrentPatient->GetAddress());
-}
-void ViewPatient::CheckChangesBDate(const QDate & _arg) {
-    ui->btnUpdatePatient->setEnabled(_arg != m_pCurrentPatient->GetBirthDate());
-    ui->btnUnstageChanges->setEnabled(_arg != m_pCurrentPatient->GetBirthDate());
-}
-void ViewPatient::CheckChangesArriveDate(const QDate & _arg) {
-    ui->btnUpdatePatient->setEnabled(_arg != m_pCurrentPatient->GetArriveDate());
-    ui->btnUnstageChanges->setEnabled(_arg != m_pCurrentPatient->GetArriveDate());
-}
-void ViewPatient::CheckChangesLeaveDate(const QDate & _arg) {
-    if (m_pCurrentPatient->LeaveDate()) {
-        ui->btnUpdatePatient->setEnabled(_arg != *m_pCurrentPatient->LeaveDate());
-        ui->btnUnstageChanges->setEnabled(_arg != *m_pCurrentPatient->LeaveDate());
-    } else {
-        ui->btnUpdatePatient->setEnabled(true);
-        ui->btnUnstageChanges->setEnabled(true);
-    }
-}
+//void ViewPatient::CheckChangesLeaveDate(const QDate & _arg) {
+//    if (m_pCurrentPatient->LeaveDate()) {
+//        SetControlButtonsState(_arg != *m_pCurrentPatient->LeaveDate());
+//    } else {
+//        SetControlButtonsState(true);
+//    }
+//}
 
-void ViewPatient::on_btnSetLeaveDate_clicked(){
+void ViewPatient::on_btnSetLeaveDate_clicked() {
     ui->deLeaveDate->setEnabled(true);
     ui->deLeaveDate->setFocus();
-    ui->btnUpdatePatient->setEnabled(true);
-    ui->btnUnstageChanges->setEnabled(true);
+    SetControlButtonsState(true);
 }
 
 void ViewPatient::on_btnUnstageChanges_clicked() {
     SetLineEditFields();
-    ui->btnUpdatePatient->setEnabled(false);
-    ui->btnUnstageChanges->setEnabled(false);
+    SetControlButtonsState(false);
 }

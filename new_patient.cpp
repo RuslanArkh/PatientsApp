@@ -97,19 +97,6 @@ void NewPatient::on_pushButton_AddPatient_clicked(){
         close();
 }
 
-/*
-void NewPatient::on_pushButton_2_clicked(){
-    CreatePatient();
-    ui->lineEdit->clear();
-    ui->lineEdit_2->clear();
-    ui->lineEdit_3->clear();
-    ui->lineEdit_4->clear();
-    ui->dateEdit->date().setDate(1990, 1, 1);
-    ui->dateEdit_2->date().setDate(1990, 1, 1);
-    ui->dateEdit_3->date().setDate(1990, 1, 1);
-}
-*/
-
 void NewPatient::on_checkBox_LeaveDateIsDefined_stateChanged(int arg1){
     ui->dateEdit_LeaveDate->setDisabled(arg1);
 }

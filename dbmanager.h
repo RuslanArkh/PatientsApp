@@ -27,7 +27,7 @@ public:
     DBManager(const QString & _databaseName);
     ~DBManager();
 
-    Patient * insert(Patient & p) const;
+    void insert(const Patient & p) const;
     void insert(const Photo & _photo) const;
 
     std::vector<Patient *> * SelectAllPatients();

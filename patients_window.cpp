@@ -105,8 +105,10 @@ void PatientsWindow::on_tvPatients_doubleClicked(const QModelIndex &proxy_index)
     std::vector<Photo *> * photos = m_pDatabaseManager->SelectByPatientId(pP->GetId());
 
     try {
+        //  TODO: Load photos in different threads
         pP->loadPhotos(photos);
         ViewPatient photos_window(pP, this);
+        //  TODO: NOT MODAL
         photos_window.exec();
         pP->clearPhotos();
     } catch (Patient_Ex::PhotosAlreadyLoadedError) {
@@ -135,8 +137,7 @@ void PatientsWindow::on_tvPatients_clicked(const QModelIndex &index) {
     ui->btn_DeletePatient->setDisabled(index.row() == -1);
 }
 
-void PatientsWindow::on_tvPatients_activated(const QModelIndex &index)
-{
+void PatientsWindow::on_tvPatients_activated(const QModelIndex &index) {
     ui->btn_DeletePatient->setDisabled(index.row() == -1);
 }
 

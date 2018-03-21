@@ -30,6 +30,7 @@ DBManager::DBManager(const QString & _str) {
     }
 
     QSqlQuery query;
+    query.exec("PRAGMA foreign_keys = ON");
     query.exec("create table patient (id INTEGER primary key, "
                "first_name varchar(30),"
                "last_name varchar(30),"
@@ -45,7 +46,7 @@ DBManager::DBManager(const QString & _str) {
                "filename TEXT,"
                "image_data BLOB,"
                "created_on TEXT,"
-               "FOREIGN KEY (patient_id) REFERENCES patient(id))");
+               "FOREIGN KEY (patient_id) REFERENCES patient(id) ON DELETE CASCADE);");
 
 }
 
@@ -55,7 +56,7 @@ DBManager::~DBManager() {
 }
 
 
-Patient * DBManager::insert(Patient & p) const {
+void DBManager::insert(const Patient & p) const {
     QSqlQuery query;
     query.prepare("INSERT INTO patient"
           "(first_name, last_name, father_name, address, birth_date, arrival_date, leave_date) "
@@ -77,7 +78,6 @@ Patient * DBManager::insert(Patient & p) const {
 
     qDebug() << "Patient inserted!";
     p.SetId(query.lastInsertId().toInt());
-    return &p;
 }
 
 void DBManager::insert(const Photo & _photo) const {
@@ -98,6 +98,7 @@ void DBManager::insert(const Photo & _photo) const {
 
 void DBManager::removePatient(int _id) {
     QSqlQuery query;
+//    query.prepare("DELETE FROM photo WHERE ")
     query.prepare("DELETE FROM patient WHERE id = (:id)");
     query.bindValue(":id", _id);
     if (!query.exec())
@@ -143,6 +144,7 @@ std::vector<Photo *> * DBManager::SelectByPatientId(int _id) {
     if (query.exec()) {
         std::vector<Photo *> * photos = new std::vector<Photo *>;
         while (query.next()) {
+
             int temp_id = query.value(0).toInt();
             int temp_patient_id = query.value(1).toInt();
             QString temp_filename = query.value(2).toString();
