@@ -10,22 +10,34 @@
 #include <vector>
 #include <list>
 
+#include <QString>
+
 #include "patient.h"
 #include "photo.h"
 
+const QString DATABASE_FILENAME = "patients.db";
 
-//  TODO: make it singleton
+//  TODO: make it singleton - DONE
 class DBManager {
-    QSqlDatabase * m_db;
-
-    static const std::regex db_file_format;
 
 public:
 
     static DBManager & instance();
 
-    DBManager(const QString & _databaseName);
     ~DBManager();
+
+protected:
+
+    DBManager(const QString & databaseName = DATABASE_FILENAME);
+    DBManager & operator=(const DBManager & rhs);
+
+private:
+
+    QSqlDatabase * mDatabase;
+
+public:
+
+    //  TODO: Create DAO's for every model instead of following methods
 
     void insert(const Patient & p) const;
     void insert(const Photo & _photo) const;
@@ -47,6 +59,6 @@ private:
     std::vector<Patient *> * GetPatientsFromQuery(QSqlQuery & _q);
 };
 
-inline bool DBManager::HasTable(const QString & _table) { return m_db->tables().contains(_table); }
+inline bool DBManager::HasTable(const QString & _table) { return mDatabase->tables().contains(_table); }
 
 #endif // DBMANAGER_H

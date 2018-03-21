@@ -36,7 +36,7 @@ class PatientsWindow
     Q_OBJECT
 
 public:
-    explicit PatientsWindow( DBManager * _db, QWidget *parent = 0);
+    explicit PatientsWindow(QWidget *parent = 0);
     ~PatientsWindow();
 
     void InsertPatient(Patient & _p);
@@ -61,13 +61,11 @@ private slots:
     void DeleteByIndex(const QModelIndex & index);
 
 private:
+
     Ui::MainWindow *ui;
 
     PatientsModel * m_pModel;
     PatientsFilterProxyModel * m_pProxyModel;
-
-    // Connection with database
-    DBManager * m_pDatabaseManager;
 
     DeleteButtonDelegate * m_pButtonDelegate;
 };

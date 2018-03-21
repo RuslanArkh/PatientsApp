@@ -9,18 +9,23 @@
 #include <QVariant>
 
 //  Just leave it here for future project modifications
-const std::regex DBManager::db_file_format { R"(^\w*[.](sqlite)$)" };
+//const std::regex DBManager::db_file_format { R"(^\w*[.](sqlite)$)" };
 
-DBManager::DBManager(const QString & _str) {
+DBManager & DBManager::instance() {
+    static DBManager singleton;
+    return singleton;
+}
+
+DBManager::DBManager(const QString & databaseName) {
     const QString Driver("QSQLITE");
-    m_db = new QSqlDatabase(QSqlDatabase::addDatabase(Driver));
+    mDatabase = new QSqlDatabase(QSqlDatabase::addDatabase(Driver));
 
-    if (!std::regex_match(_str.toStdString(), db_file_format))
-        DBManagerEx::SqlFileWrongFormat(_str).raise();
+//    if (!std::regex_match(_str.toStdString(), db_file_format))
+//        DBManagerEx::SqlFileWrongFormat(_str).raise();
 
-    m_db->setDatabaseName(qApp->applicationDirPath() + QDir::separator() + _str);
+    mDatabase->setDatabaseName(qApp->applicationDirPath() + QDir::separator() + databaseName);
 
-    if (!m_db->open()) {
+    if (!mDatabase->open()) {
         QMessageBox::critical(0, qApp->tr("Cannot open database"),
             qApp->tr("Unable to establish a database connection.\n"
                      "This example needs SQLite support. Please read "
@@ -51,8 +56,8 @@ DBManager::DBManager(const QString & _str) {
 }
 
 DBManager::~DBManager() {
-    m_db->close();
-    delete m_db;
+    mDatabase->close();
+    delete mDatabase;
 }
 
 

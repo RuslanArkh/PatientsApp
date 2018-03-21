@@ -14,19 +14,8 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    try {
-        DBManager manager{"my_db.sqlite"};
-        PatientsWindow w(&manager);
-        w.setWindowIcon(QIcon(":/app_images/medicine.png"));
-        w.show();
-        return a.exec();
-    } catch (DBManagerEx::SqlFileWrongFormat & _ex) {
-        QString exc_msg{};
-        exc_msg += "Wrong format of file: '" + _ex.message() + "'!\n";
-        exc_msg += "Use '.sqlite' format.";
-        QMessageBox::critical(nullptr, "SqlError",
-                              exc_msg,
-                              QMessageBox::Ok);
-        return -1;
-    }
+    PatientsWindow w;
+    w.setWindowIcon(QIcon(":/app_images/medicine.png"));
+    w.show();
+    return a.exec();
 }
