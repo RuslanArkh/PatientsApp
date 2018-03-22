@@ -55,10 +55,12 @@ bool NewPatient::CreatePatient() {
 
     PatientsWindow * win =  dynamic_cast<PatientsWindow *>(parentWidget());
     try {
-        Patient * p =
-                new Patient(fname, lname, father_name, address, bdate, arrDate, *leaveDate);
-        win->InsertPatient(*p);
-    } catch (Patient_Ex::BirthAndArriveDateLogicError & _ex) {
+        Patient * patient = new Patient(fname, lname, father_name, address, bdate, arrDate, *leaveDate);
+//        win->InsertPatient(*p);
+        DBManager::instance().patientDao.addPatient(*patient);
+        //  TODO: signal/slots for PatientsModel
+    }
+    catch (Patient_Ex::BirthAndArriveDateLogicError & _ex) {
         QString exc_msg{};
         exc_msg += _ex.message() + "\n";
         exc_msg += "Press OK to cancel person creation\n";

@@ -39,7 +39,9 @@ SOURCES += \
     patients_model.cpp \
     delete_button_delegate.cpp \
     cremovepatientbutton.cpp \
-    patients_filter_proxy_model.cpp
+    patients_filter_proxy_model.cpp \
+    patientdao.cpp \
+    photodao.cpp
 
 HEADERS += \
     patient.h \
@@ -53,7 +55,9 @@ HEADERS += \
     patients_model.h \
     patients_filter_proxy_model.h \
     delete_button_delegate.h \
-    cremovepatientbutton.h
+    cremovepatientbutton.h \
+    patientdao.h \
+    photodao.h
 
 FORMS += \
         mainwindow.ui \

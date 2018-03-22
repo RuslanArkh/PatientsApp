@@ -6,6 +6,8 @@
 
 #include "photo.h"
 
+#include "dbmanager.h"
+
 #include <QPixmap>
 #include <QIcon>
 #include <QFileDialog>
@@ -118,7 +120,7 @@ void ViewPatient::on_btnNewPhoto_clicked(){
     QStringList file_names = QFileDialog::getOpenFileNames(this,
                                                      "Open a file",
                                                      qApp->applicationDirPath() + QDir::separator(),
-                                                     tr("Image Files (*.jpg *.JPG);;"));
+                                                     tr("Image Files (*.jpg *.JPG *.jpeg *.JPEG);;"));
     //  Converting list of selected images to standard list
     std::list<QString> file_list = file_names.toStdList();
 
@@ -138,7 +140,8 @@ void ViewPatient::on_btnNewPhoto_clicked(){
                                      temp_pixMap,
                                      QDate::currentDate());
         m_pCurrentPatient->AddPhoto(new_file);
-        m_pPatientsWindow->InsertPhoto(*new_file);
+
+        DBManager::instance().photoDao.addPhoto(*new_file);
         AddItemToWidget(new_file);
     }
 }
@@ -150,8 +153,9 @@ void ViewPatient::on_btnDeletePhoto_clicked() {
         Photo * _photo = m_pCurrentPatient->Photos()->at(row_num);
         int photo_id = _photo->GetId();
         delete ui->listWidget_ImageGallery->takeItem(row_num);
-        m_pCurrentPatient->DropPhoto(row_num);;
-        m_pPatientsWindow->DeletePhotoFromDB(photo_id);
+        m_pCurrentPatient->DropPhoto(row_num);
+
+        DBManager::instance().photoDao.removePhoto(photo_id);
     }
 }
 
@@ -163,7 +167,7 @@ void ViewPatient::on_btnUpdatePatient_clicked() {
     m_pCurrentPatient->SetBirthDate(ui->deBirthDate->date());
     m_pCurrentPatient->SetArriveDate(ui->deArriveDate->date());
 
-    m_pPatientsWindow->UpdatePatient(*m_pCurrentPatient);
+    DBManager::instance().patientDao.updatePatient(*m_pCurrentPatient);
 
     SetControlButtonsState(false);
 }

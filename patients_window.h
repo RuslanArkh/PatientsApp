@@ -12,15 +12,13 @@
 
 #include <vector>
 
-#include "dbmanager.h"
+
 #include "photo.h"
 #include "patient.h"
 #include "patients_model.h"
 #include "patients_filter_proxy_model.h"
 #include "delete_button_delegate.h"
 
-#include "new_patient.h"
-#include "view_patient.h"
 
 namespace Ui {
 class MainWindow;

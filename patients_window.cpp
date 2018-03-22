@@ -14,6 +14,7 @@
 #include <QDate>
 #include <QSortFilterProxyModel>
 #include <QStringList>
+
 #include <string>
 #include <algorithm>
 #include <regex>
@@ -25,7 +26,7 @@ PatientsWindow::PatientsWindow(QWidget *parent) :
     ui->setupUi(this);
 
     //  Selecting all patients from database into std::vector
-    std::vector<Patient *> * allPatients = DBManager::instance().SelectAllPatients();
+    std::vector<Patient *> * allPatients = DBManager::instance().patientDao.patientsAll();
 
     //  Creating custom MODEL for patients
     m_pModel = new PatientsModel(allPatients, ui->tvPatients);
@@ -63,27 +64,28 @@ PatientsWindow::~PatientsWindow()
 }
 
 void PatientsWindow::InsertPatient(Patient & p) {
-    DBManager::instance().insert(p);
+    DBManager::instance().patientDao.addPatient(p);
     m_pModel->AddPatient(p);
 }
 
 void PatientsWindow::InsertPhoto(Photo & photo) {
-    DBManager::instance().insert(photo);
+    DBManager::instance().photoDao.addPhoto(photo);
 }
 
 void PatientsWindow::UpdatePatient(Patient & p) {
-    DBManager::instance().Update(p);
+    DBManager::instance().patientDao.updatePatient(p);
+
     int row = ui->tvPatients->currentIndex().row();
     m_pModel->dataChanged(m_pModel->index(row, 0), m_pModel->index(row, 1));
 }
 
 void PatientsWindow::DeletePhotoFromDB(int id) {
-    DBManager::instance().removePhoto(id);
+    DBManager::instance().photoDao.removePhoto(id);
 }
 
 void PatientsWindow::on_btn_DeletePatient_clicked() {
     int source_index_row = m_pProxyModel->mapToSource(ui->tvPatients->currentIndex()).row();
-    DBManager::instance().removePatient(m_pModel->GetPatient(source_index_row)->GetId());
+    DBManager::instance().patientDao.removePatient(m_pModel->GetPatient(source_index_row)->GetId());
     m_pModel->DeletePatient(source_index_row);
     ui->btn_DeletePatient->setDisabled(true);
     ui->tvPatients->setCurrentIndex(QModelIndex(m_pModel->index(-1, -1)));
@@ -99,7 +101,7 @@ void PatientsWindow::on_btn_NewPatient_clicked() {
 void PatientsWindow::on_tvPatients_doubleClicked(const QModelIndex &proxy_index){
     int source_index_row = m_pProxyModel->mapToSource(proxy_index).row();
     Patient * pP = m_pModel->GetPatient(source_index_row);
-    std::vector<Photo *> * photos = DBManager::instance().SelectByPatientId(pP->GetId());
+    std::vector<Photo *> * photos = DBManager::instance().photoDao.photosByPatientId(pP->GetId());
 
     try {
         //  TODO: Load photos in different threads
@@ -148,7 +150,7 @@ void PatientsWindow::DeleteByIndex(const QModelIndex & index) {
     question += pP->GetFullName() + " will be deleted. Are you sure?";
     reply = QMessageBox::question(this, "Patient deletion", question, QMessageBox::Yes | QMessageBox::No);
     if (reply == QMessageBox::Yes) {
-        DBManager::instance().removePatient(pP->GetId());
+        DBManager::instance().patientDao.removePatient(pP->GetId());
         m_pModel->DeletePatient(source_index);
     }
 }
