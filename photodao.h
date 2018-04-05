@@ -2,12 +2,15 @@
 #define PHOTODAO_H
 
 #include <vector>
+#include <QSqlQuery>
 
 class Photo;
 class QSqlDatabase;
 class Patient;
 class QSqlQuery;
 class QString;
+
+class Photo;
 
 class PhotoDao {
 
@@ -20,6 +23,8 @@ public:
     void removePhoto(int id) const;
 
     std::vector<Photo *> * photosByPatientId(int id) const;
+
+    QSqlQuery photosByPatientIdQuery(int id) const;
 
 private:
 

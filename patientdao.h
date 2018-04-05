@@ -3,6 +3,7 @@
 
 #include <vector>
 
+
 class QSqlDatabase;
 class Patient;
 class QSqlQuery;

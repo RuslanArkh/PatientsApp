@@ -41,7 +41,8 @@ SOURCES += \
     cremovepatientbutton.cpp \
     patients_filter_proxy_model.cpp \
     patientdao.cpp \
-    photodao.cpp
+    photodao.cpp \
+    photoloaderthread.cpp
 
 HEADERS += \
     patient.h \
@@ -57,7 +58,8 @@ HEADERS += \
     delete_button_delegate.h \
     cremovepatientbutton.h \
     patientdao.h \
-    photodao.h
+    photodao.h \
+    photoloaderthread.h
 
 FORMS += \
         mainwindow.ui \

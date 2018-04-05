@@ -3,11 +3,14 @@
 
 #include <QDialog>
 #include <QString>
-#include <vector>
 #include <QLabel>
 #include <QDateEdit>
 
+#include <vector>
+#include <memory>
+
 #include "patient.h"
+#include "photoloaderthread.h"
 
 class Photo;
 class PatientsWindow;
@@ -36,6 +39,15 @@ private slots:
     void on_btnSetLeaveDate_clicked();
     void on_btnUnstageChanges_clicked();
 
+    //  Used to add photos, which are loaded in another thread.
+    void AddPhotoToWidget( Photo * p);
+    void AddPhotoToVector( Photo * p);
+    void EnablePhotoButtons();
+
+public slots:
+
+    void reject() override;
+
 private:
 
     void AddItemToWidget(Photo * _p);
@@ -51,6 +63,8 @@ private:
     Patient * m_pCurrentPatient;
 
     void SetControlButtonsState(bool is_enabled);
+
+    PhotoLoaderThread * mLoaderThread;
 
 };
 

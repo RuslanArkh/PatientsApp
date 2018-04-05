@@ -101,19 +101,21 @@ void PatientsWindow::on_btn_NewPatient_clicked() {
 void PatientsWindow::on_tvPatients_doubleClicked(const QModelIndex &proxy_index){
     int source_index_row = m_pProxyModel->mapToSource(proxy_index).row();
     Patient * pP = m_pModel->GetPatient(source_index_row);
-    std::vector<Photo *> * photos = DBManager::instance().photoDao.photosByPatientId(pP->GetId());
+
+    //  FIXME: Load in another thread
+    //std::vector<Photo *> * photos = DBManager::instance().photoDao.photosByPatientId(pP->GetId());
 
     try {
         //  TODO: Load photos in different threads
-        pP->loadPhotos(photos);
+        //pP->loadPhotos(photos);
         ViewPatient photos_window(pP, this);
         //  TODO: NOT MODAL
         photos_window.exec();
-        pP->clearPhotos();
+//        pP->clearPhotos();
     } catch (Patient_Ex::PhotosAlreadyLoadedError) {
-        for (Photo * pPhoto: *photos)
-            delete pPhoto;
-        delete photos;
+//        for (Photo * pPhoto: *photos)
+//            delete pPhoto;
+//        delete photos;
         QMessageBox::critical(this, QString("Photos error"),
                               QString("Photos already loaded."),
                               QMessageBox::Ok);

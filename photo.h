@@ -9,7 +9,7 @@
 #include <QPixmap>
 
 //  TODO: make regexes for all data fields
-class Photo {
+class Photo  {
 
     mutable int id;
     const int patient_id;
@@ -19,8 +19,8 @@ class Photo {
 
 public:
 
-    Photo(int _id, int parent_id, const QString & _f, const QDate & _created);
-    Photo(int parent_id, const QString & _f, const QPixmap & _pMap, const QDate & _created  = QDate::currentDate());
+    Photo(int _id, int parent_id, const QString _f, const QDate _created);
+    Photo(int parent_id, const QString _f, const QPixmap _pMap, const QDate _created  = QDate::currentDate());
 
     void SetId(int _id) const;
 

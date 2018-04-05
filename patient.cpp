@@ -9,7 +9,7 @@ Patient::Patient(
         const QDate & arr,
         QDate & le)
     : _FirstName{f}, _LastName{l}, _FatherName{father}, _Address{a}
-     , _BirthDate{bD}, _ArriveDate{arr}, m_pLeaveDate{&le}, m_pPhotosVector{nullptr}
+     , _BirthDate{bD}, _ArriveDate{arr}, m_pLeaveDate{&le}, m_pPhotosVector{new std::vector<Photo *>()}
 {
 }
 
@@ -28,6 +28,7 @@ Patient::Patient(const Patient & p)
 Patient::~Patient() {
     if (m_pLeaveDate)
         delete m_pLeaveDate;
+    delete m_pPhotosVector;
 }
 
 const QString Patient::GetFullName() const {
@@ -43,12 +44,12 @@ void Patient::loadPhotos(std::vector<Photo*> * photos) {
         Patient_Ex::PhotosAlreadyLoadedError().raise();
 }
 
+
 void Patient::clearPhotos() {
-    if (m_pPhotosVector)
-        for (Photo * pPhoto: * m_pPhotosVector)
-            delete pPhoto;
+    for (Photo * pPhoto: * m_pPhotosVector)
+        delete pPhoto;
     delete m_pPhotosVector;
-    m_pPhotosVector = nullptr;
+    m_pPhotosVector = new std::vector<Photo *>();
 }
 
 const std::vector<Photo *> * Patient::Photos() const {

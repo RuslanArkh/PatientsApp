@@ -24,7 +24,8 @@
 ViewPatient::ViewPatient(Patient * patient,
                              QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::ViewPatient)
+    ui(new Ui::ViewPatient),
+    mLoaderThread(new PhotoLoaderThread(patient->GetId()))
 {
     ui->setupUi(this);
     m_pPatientsWindow = dynamic_cast<PatientsWindow *>(parentWidget());
@@ -37,8 +38,20 @@ ViewPatient::ViewPatient(Patient * patient,
     ui->listWidget_ImageGallery->setIconSize(QSize(ICON_WIDTH, ICON_HEIGHT));
     ui->listWidget_ImageGallery->setResizeMode(QListWidget::Adjust);
 
-    for (Photo * _p: *m_pCurrentPatient->Photos())
-        AddItemToWidget(_p);
+    ui->btnNewPhoto->setEnabled(false);
+    ui->btnDeletePhoto->setEnabled(false);
+
+//    for (Photo * _p: *m_pCurrentPatient->Photos())
+//        AddItemToWidget(_p);
+
+    connect(mLoaderThread, &PhotoLoaderThread::PhotoLoaded,
+            this, &ViewPatient::AddPhotoToWidget,
+            Qt::BlockingQueuedConnection);
+//    connect(mLoaderThread, &PhotoLoaderThread::PhotoLoaded, m_pCurrentPatient, &Patient::AddPhoto);
+    connect(mLoaderThread, &PhotoLoaderThread::finished, this, &ViewPatient::EnablePhotoButtons);
+    //connect(mLoaderThread, &PhotoLoaderThread::finished, mLoaderThread, &QObject::deleteLater);
+
+    mLoaderThread->start();
 
     auto reflect = [this] (QVariant arg_prev, QVariant arg_cur) {
         this->SetControlButtonsState(arg_prev != arg_cur);
@@ -78,6 +91,8 @@ ViewPatient::ViewPatient(Patient * patient,
 
 ViewPatient::~ViewPatient()
 {
+    m_pCurrentPatient->clearPhotos();
+    delete mLoaderThread;
     delete ui;
 }
 
@@ -115,7 +130,7 @@ void ViewPatient::AddItemToWidget(Photo * p) {
     ui->listWidget_ImageGallery->addItem(itm);
 }
 
-void ViewPatient::on_btnNewPhoto_clicked(){
+void ViewPatient::on_btnNewPhoto_clicked() {
     //  Open dialog box for selectig .jpg images
     QStringList file_names = QFileDialog::getOpenFileNames(this,
                                                      "Open a file",
@@ -150,7 +165,7 @@ void ViewPatient::on_btnDeletePhoto_clicked() {
     QList<QListWidgetItem*> items = ui->listWidget_ImageGallery->selectedItems();
     foreach (QListWidgetItem * item, items) {
         int row_num = ui->listWidget_ImageGallery->row(item);
-        Photo * _photo = m_pCurrentPatient->Photos()->at(row_num);
+        const Photo * _photo = m_pCurrentPatient->Photos()->at(row_num);
         int photo_id = _photo->GetId();
         delete ui->listWidget_ImageGallery->takeItem(row_num);
         m_pCurrentPatient->DropPhoto(row_num);
@@ -189,4 +204,34 @@ void ViewPatient::on_btnSetLeaveDate_clicked() {
 void ViewPatient::on_btnUnstageChanges_clicked() {
     SetLineEditFields();
     SetControlButtonsState(false);
+}
+
+void ViewPatient::AddPhotoToWidget( Photo * p) {
+    QPixmap outPixmap {p->GetPixmap()};
+    QIcon icon(outPixmap.scaled(ICON_WIDTH, ICON_HEIGHT,
+                                Qt::KeepAspectRatio));
+
+    QListWidgetItem * itm = new QListWidgetItem(icon, p->GetFileName());
+    itm->setTextAlignment(Qt::AlignBottom | Qt::AlignHCenter);
+    ui->listWidget_ImageGallery->addItem(itm);
+    m_pCurrentPatient->AddPhoto(p);
+}
+
+void ViewPatient::AddPhotoToVector( Photo *p) {
+    m_pCurrentPatient->AddPhoto(p);
+}
+
+void ViewPatient::EnablePhotoButtons() {
+    ui->btnNewPhoto->setEnabled(true);
+    ui->btnDeletePhoto->setEnabled(true);
+}
+
+void ViewPatient::reject() {
+    if (mLoaderThread->isRunning()) {
+        mLoaderThread->stopProcess();
+        connect(mLoaderThread, &PhotoLoaderThread::Abort, this, &QDialog::reject);
+    }
+    else {
+        QDialog::reject();
+    }
 }

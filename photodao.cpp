@@ -75,3 +75,13 @@ std::vector<Photo *> * PhotoDao::photosByPatientId(int id) const {
         return nullptr;
     }
 }
+
+QSqlQuery PhotoDao::photosByPatientIdQuery(int id) const {
+    QSqlQuery query(mDatabase);
+    query.prepare("SELECT * FROM photo WHERE patient_id=(:patient_id)");
+    query.bindValue(":patient_id", id);
+    if (query.exec()) {
+        return query;
+    }
+    DBManagerEx::SqlQueryFailed(query.lastError()).raise();
+}
